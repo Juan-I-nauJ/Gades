@@ -83,9 +83,11 @@ export default {
 }
 
 .burger-button {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
+  z-index: 100;
+  opacity: 0.5;
 }
 
 .burger-button span {

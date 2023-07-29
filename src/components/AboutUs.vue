@@ -3,11 +3,11 @@
     <v-responsive class="align-center text-center fill-height border pa-4">
         <article>
             <header class="mb-5">
-        <h1 class="text-h2">Sobre Nosotros</h1>
+        <h1 class="text-h2">About Us</h1>
             </header>
             <main>
                 
-                <v-card class="pa-3" title="El Equipo" text="Somos un pequeño equipo formado por mí mismo y las voces que me dicen como escribir código, representadas aquí debajo." variant="tonal">
+                <v-card class="pa-3" title="Our Team" text="We are a small team composed of myself and the voices that tell me how to write code. Artist's depiction below." variant="tonal">
                     <v-img
                     class="ma-auto"
 :width="400"
@@ -16,7 +16,7 @@
   src="https://media.tenor.com/eFDfS9OvBuYAAAAd/omniman-invincible.gif"
 ></v-img>
                 </v-card>
-                <v-card class="pa-3 mt-10" title="Localización" text="Estamos basados en una isla flotante con un molino que sobrevuela el océano índico." variant="tonal">
+                <v-card class="pa-3 mt-10" title="Location" text="We are located on top of a floating island with a tree sailing the clouds over the indian ocean." variant="tonal">
                 <v-img
                 class="ma-auto"
                 :width="400"

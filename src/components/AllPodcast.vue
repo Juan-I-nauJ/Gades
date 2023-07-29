@@ -4,16 +4,21 @@
             <article>
                 <header>
                     <h1 class="text-h3">Podcaster</h1>
+                      <div class="text-right spinner" v-if="isLoading">
+    <v-progress-circular
+      indeterminate
+      color="primary"
+    ></v-progress-circular>
+    </div>
                 </header>
                 <hr>
                 <main class="main-container">
-                    <div class="search-bar">
+                    <div class="search-bar mb-5">
                         <span class="bg-primary rounded-lg "><strong>100</strong></span> <v-text-field focused
-                            class="search-input" v-model="search" :rules="searchRules" label="Filter podcasts..."
-                            required></v-text-field>
+                            class="search-input" v-model="search" @blur="console.log(this.allList.filter(element =>element.title.label.toUpperCase().includes(search.toUpperCase())))" :rules="searchRules" label="Filter podcasts..."></v-text-field>
                     </div>
                     <div class="podcast-list">
-                        <v-row no-gutters>
+                                <v-row no-gutters v-if="search === ''">
                             <v-col v-for="podcast in allList" :key="podcast.id.attributes['im:id']" cols="6" lg="3">
                                 <v-sheet rounded :elevation="9" class="podcast-container">
                                     <div class="image-container">
@@ -23,13 +28,21 @@
                                     <strong>{{ podcast['im:name'].label }}</strong>
                                     <p>Author: {{ podcast['im:artist'].label }}</p>
                                 </v-sheet>
-
                             </v-col>
                         </v-row>
-
-
-
-
+                        <v-row v-else>
+                            <h3 v-if="filterList.length < 1">No podcast author or title contains {{search}}</h3>
+                            <v-col v-for="podcast in filterList" :key="podcast.id" cols="6" lg="3" v-else>
+                                <v-sheet rounded :elevation="9" class="podcast-container">
+                                    <div class="image-container">
+                                        <img :src="podcast['im:image'][2].label" />
+                                        <!-- <v-img :aspect-ratio="16/9" :src="podcast['im:image'][2].label"></v-img> -->
+                                    </div>
+                                    <strong>{{ podcast['im:name'].label }}</strong>
+                                    <p>Author: {{ podcast['im:artist'].label }}</p>
+                                </v-sheet>
+                            </v-col>
+                        </v-row>
                     </div>
                 </main>
             </article>
@@ -52,8 +65,17 @@ export default {
                 return 'Please input something to filter by.'
             },
         ],
-        allList: null
+        allList: [],
+        searchList: [],
     }),
+    computed: {
+        isLoading(){
+            return this.allList.length <= 0;
+        },
+        filterList(){
+            return this.allList.filter((element)=>element['im:artist'].label.toUpperCase().includes(this.search.toUpperCase()) || element.title.label.toUpperCase().includes(this.search.toUpperCase()));
+        }
+    },
     methods: {
         //this method gathers the podcast array from the api, tops out at 100 entries.
         getList() {
@@ -114,7 +136,7 @@ article>header {
 
 
 
-/*for desktops*/
+/*FOR DESKTOPS*/
 @media (min-width: 40rem) {
     article>header {
         text-align: left;
@@ -156,4 +178,5 @@ article>header {
     }
 
 }
+/*END OF DESKTOP MEDIA QUERY*/
 </style>
