@@ -32,6 +32,7 @@ const routes = [
           {
             path: ':id',
             name: 'details dummy',
+            props: true,
             component: () => import(/* webpackChunkName: "details" */ '@/views/SinglePodcast.vue'),
           },
         ]

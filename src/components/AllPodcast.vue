@@ -16,10 +16,10 @@
                             <v-col v-for="podcast in allList" :key="podcast.id.attributes['im:id']" cols="12" sm="6" lg="3">
                                 <v-sheet rounded :elevation="9" class="podcast-container">
                                     <router-link :to="this.$route.path + '/' + podcast.id.attributes['im:id']">
-                                    <div class="image-container">
-                                        <img :src="podcast['im:image'][2].label" />
-                                    </div>
-                                </router-link>
+                                        <div class="image-container">
+                                            <img :src="podcast['im:image'][2].label" />
+                                        </div>
+                                    </router-link>
                                     <strong>{{ podcast['im:name'].label }}</strong>
                                     <p>Author: {{ podcast['im:artist'].label }}</p>
                                 </v-sheet>
@@ -31,11 +31,10 @@
                             <v-col v-for="podcast in filterList" :key="podcast.id" cols="12" sm="6" lg="3" v-else>
                                 <v-sheet rounded :elevation="9" class="podcast-container">
                                     <router-link :to="this.$route.path + '/' + podcast.id.attributes['im:id']">
-                                    <div class="image-container">
-                                        <img :src="podcast['im:image'][2].label" />
-                                    </div>
-                                </router-link>
-
+                                        <div class="image-container">
+                                            <img :src="podcast['im:image'][2].label" />
+                                        </div>
+                                    </router-link>
                                     <strong>{{ podcast['im:name'].label }}</strong>
                                     <p>Author: {{ podcast['im:artist'].label }}</p>
                                 </v-sheet>
@@ -61,7 +60,7 @@ export default {
         search: '',
         allList: [],
         searchList: [],
-       
+
     }),
     computed: {
         isLoading() {
@@ -70,7 +69,7 @@ export default {
         filterList() {
             return this.allList.filter((element) => element['im:artist'].label.toUpperCase().includes(this.search.toUpperCase()) || element.title.label.toUpperCase().includes(this.search.toUpperCase()));
         },
-        activeList(){
+        activeList() {
             return this.$route.path === '/main';
         }
     },
@@ -78,16 +77,16 @@ export default {
         //this method gathers the podcast array from the api, tops out at 100 entries.
         getList() {
             axios.get('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')
-                .then((response) => { this.allList = response.data.feed.entry; console.log('allList tiene: ', this.allList) });
+                .then((response) => this.allList = response.data.feed.entry);
         },
-        hideList(){
+        hideList() {
             this.viewingList = !this.viewingList;
         }
     },
     mounted() {
         //this method calls getList when the component is mounted, it will need an if statement down the line to interface with 
         //localstorage.
-    
+
         this.getList();
     }
 }
@@ -141,14 +140,14 @@ export default {
 
 .image-container>img {
     border-radius: 50%;
-    filter:grayscale(1);
- 
+    filter: grayscale(1);
+
 }
 
 .image-container>img:hover,
-.image-container>img:active{
-    filter:grayscale(0);
-    filter:brightness(200%);
+.image-container>img:active {
+    filter: grayscale(0);
+    filter: brightness(200%);
 }
 
 .error-message {
@@ -171,12 +170,13 @@ export default {
 /*END OF TABLET MEDIA QUERY*/
 
 /*FOR LARGE TABLETS OR LAPTOPS*/
-@media (min-width: 55rem){
+@media (min-width: 55rem) {
     .image-container {
         position: absolute;
         left: 28%;
     }
 }
+
 /*END OF LAPTOP MEDIA QUERY*/
 
 /*FOR DESKTOPS*/
@@ -206,12 +206,12 @@ export default {
 /*END OF DESKTOP MEDIA QUERY*/
 
 /*FOR WIDE SCREENS*/
-@media (min-width: 120rem){
+@media (min-width: 120rem) {
 
 
-.image-container {
-    left: 29%;
+    .image-container {
+        left: 29%;
+    }
 }
-}
-/*END OF WIDE SCREENS*/
-</style>
+
+/*END OF WIDE SCREENS*/</style>
