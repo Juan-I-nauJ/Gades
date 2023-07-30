@@ -18,16 +18,17 @@
               value="contact"></v-list-item></router-link>
               <router-link to='/main'><v-list-item prepend-icon="mdi-forum" title="Podcast List"
                 value="main"></v-list-item></router-link>
+                <router-link to='/details'></router-link>
 
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <!-- <div class="dark-cover" v-if="drawer" @click="toggleDrawer" /> -->
-
+        
         <div class="justify-center align-center h-100">
           <v-btn class="burger-button" @click.stop="drawer = !drawer">
             <v-icon icon="$vuetify"></v-icon>
           </v-btn>
+          <the-header />
           <router-view />
           <added-footer />
         </div>
@@ -38,10 +39,12 @@
 
 <script>
   import AddedFooter from './../added/Footer.vue'
+  import Header from '../added/Header.vue';
 
 export default {
   components: {
-    AddedFooter
+    AddedFooter,
+    TheHeader: Header,
   },
   data() {
     return {
@@ -59,15 +62,6 @@ export default {
 </script>
 
 <style scoped>
-/*.dark-cover {
-  position: fixed;
-  background-color: rgba(0, 0, 0, 0.20);
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 100;
-}*/
 
 .menu-content {
   z-index: 100;
@@ -83,7 +77,7 @@ export default {
 }
 
 .burger-button {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 100;
@@ -94,10 +88,4 @@ export default {
   border-bottom: 5px solid black;
 }
 
-/*this media query removes the overlay for desktops*/
-@media (min-width: 40rem) {
-  .dark-cover {
-    display: none;
-  }
-}
 </style>

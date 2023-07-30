@@ -1,43 +1,41 @@
 <template>
     <v-container class="fill-height">
-        <v-responsive class="align-center text-center fill-height border pa-4">
-            <article>
-                <header>
-                    <h1 class="text-h3">Podcaster</h1>
-                      <div class="text-right spinner" v-if="isLoading">
-    <v-progress-circular
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
-    </div>
-                </header>
-                <hr>
+        <v-responsive class="align-center text-center border pa-4">
+            <div class="text-right spinner" v-if="isLoading">
+                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            </div>
+            <router-view></router-view>
+            <article v-if="activeList">
                 <main class="main-container">
                     <div class="search-bar mb-5">
-                        <span class="bg-primary rounded-lg "><strong>100</strong></span> <v-text-field focused
-                            class="search-input" v-model="search" @blur="console.log(this.allList.filter(element =>element.title.label.toUpperCase().includes(search.toUpperCase())))" :rules="searchRules" label="Filter podcasts..."></v-text-field>
+                        <v-text-field focused class="search-input" v-model="search"
+                            label="Filter podcasts..."></v-text-field>
                     </div>
                     <div class="podcast-list">
-                                <v-row no-gutters v-if="search === ''">
-                            <v-col v-for="podcast in allList" :key="podcast.id.attributes['im:id']" cols="6" lg="3">
+                        <v-row no-gutters v-if="search === ''">
+                            <v-col v-for="podcast in allList" :key="podcast.id.attributes['im:id']" cols="12" sm="6" lg="3">
                                 <v-sheet rounded :elevation="9" class="podcast-container">
+                                    <router-link :to="this.$route.path + '/' + podcast.id.attributes['im:id']">
                                     <div class="image-container">
                                         <img :src="podcast['im:image'][2].label" />
-                                        <!-- <v-img :aspect-ratio="16/9" :src="podcast['im:image'][2].label"></v-img> -->
                                     </div>
+                                </router-link>
                                     <strong>{{ podcast['im:name'].label }}</strong>
                                     <p>Author: {{ podcast['im:artist'].label }}</p>
                                 </v-sheet>
                             </v-col>
                         </v-row>
                         <v-row v-else>
-                            <h3 v-if="filterList.length < 1">No podcast author or title contains {{search}}</h3>
-                            <v-col v-for="podcast in filterList" :key="podcast.id" cols="6" lg="3" v-else>
+                            <h3 class="text-h5 error-message" v-if="filterList.length < 1">No podcast author or title
+                                contains {{ search }}</h3>
+                            <v-col v-for="podcast in filterList" :key="podcast.id" cols="12" sm="6" lg="3" v-else>
                                 <v-sheet rounded :elevation="9" class="podcast-container">
+                                    <router-link :to="this.$route.path + '/' + podcast.id.attributes['im:id']">
                                     <div class="image-container">
                                         <img :src="podcast['im:image'][2].label" />
-                                        <!-- <v-img :aspect-ratio="16/9" :src="podcast['im:image'][2].label"></v-img> -->
                                     </div>
+                                </router-link>
+
                                     <strong>{{ podcast['im:name'].label }}</strong>
                                     <p>Author: {{ podcast['im:artist'].label }}</p>
                                 </v-sheet>
@@ -52,28 +50,28 @@
   
 <script>
 import axios from 'axios';
+import Header from '@/layouts/added/Header.vue';
 
 export default {
+    components: {
+        TheHeader: Header,
+    },
     data: () => ({
-
         valid: false,
         search: '',
-        searchRules: [
-            value => {
-                if (value) return true
-
-                return 'Please input something to filter by.'
-            },
-        ],
         allList: [],
         searchList: [],
+       
     }),
     computed: {
-        isLoading(){
+        isLoading() {
             return this.allList.length <= 0;
         },
-        filterList(){
-            return this.allList.filter((element)=>element['im:artist'].label.toUpperCase().includes(this.search.toUpperCase()) || element.title.label.toUpperCase().includes(this.search.toUpperCase()));
+        filterList() {
+            return this.allList.filter((element) => element['im:artist'].label.toUpperCase().includes(this.search.toUpperCase()) || element.title.label.toUpperCase().includes(this.search.toUpperCase()));
+        },
+        activeList(){
+            return this.$route.path === '/main';
         }
     },
     methods: {
@@ -81,10 +79,15 @@ export default {
         getList() {
             axios.get('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')
                 .then((response) => { this.allList = response.data.feed.entry; console.log('allList tiene: ', this.allList) });
+        },
+        hideList(){
+            this.viewingList = !this.viewingList;
         }
     },
     mounted() {
-        //this method calls getList when the component is mounted, it will need an if statement down the line.
+        //this method calls getList when the component is mounted, it will need an if statement down the line to interface with 
+        //localstorage.
+    
         this.getList();
     }
 }
@@ -92,12 +95,15 @@ export default {
 </script>
   
 <style scoped>
-article>header {
-    color: rgb(63, 103, 156);
-}
+/*.spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+}*/
 
 .search-bar {
     margin: 0;
+
 }
 
 .search-bar>div {
@@ -111,72 +117,101 @@ article>header {
 .search-bar>div::before {
     content: '100';
     font-weight: 700;
-    font-size: 2rem;
     color: white;
     background-color: rgb(24, 103, 192);
     padding: 1rem;
     border-radius: 8px;
+    margin-right: 1rem;
 }
 
 .podcast-container {
     position: relative;
     padding: 5rem 2.5rem 0 2.5rem;
     margin: 5rem 1rem;
+    min-width: 6rem;
+    min-height: 10rem;
 }
 
 .image-container {
     position: absolute;
     top: -6rem;
     left: 10%;
+    border-radius: 50%;
 }
 
 .image-container>img {
     border-radius: 50%;
+    filter:grayscale(1);
+ 
+}
+
+.image-container>img:hover,
+.image-container>img:active{
+    filter:grayscale(0);
+    filter:brightness(200%);
+}
+
+.error-message {
+    margin: auto;
+    color: #dd3c00;
+    padding: 1rem;
+    border: 2px solid #dd3c00;
 }
 
 
+/*FOR TABLETS*/
+@media (min-width: 21rem) and (max-width: 54.9rem) {
+    .image-container {
+        position: absolute;
+        top: -6rem;
+        left: 25%;
+    }
+}
+
+/*END OF TABLET MEDIA QUERY*/
+
+/*FOR LARGE TABLETS OR LAPTOPS*/
+@media (min-width: 55rem){
+    .image-container {
+        position: absolute;
+        left: 28%;
+    }
+}
+/*END OF LAPTOP MEDIA QUERY*/
 
 /*FOR DESKTOPS*/
-@media (min-width: 40rem) {
-    article>header {
-        text-align: left;
-    }
+@media (min-width: 80rem) {
 
     .search-bar {
         text-align: right;
-
-    }
-
-    .search-bar>div::before {
-        display: none;
-    }
-
-    .search-bar>span {
-        vertical-align: middle;
-        font-size: 1.5rem;
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        margin-bottom: 20px;
-        border-radius: 4px;
-
-
-    }
-
-    .search-bar>span>strong {
-        font-size: 2rem;
     }
 
     .search-bar>div {
-        display: inline-block;
+        margin-left: 65%;
         vertical-align: middle;
-        width: 395.25px;
-        margin-left: 0.9rem;
+        width: 24.7rem;
     }
 
+    .search-bar>div::before {
+        margin-right: 1rem;
+    }
+
+
     .image-container {
-        left: 25%;
+        left: 17%;
     }
 
 }
+
 /*END OF DESKTOP MEDIA QUERY*/
+
+/*FOR WIDE SCREENS*/
+@media (min-width: 120rem){
+
+
+.image-container {
+    left: 29%;
+}
+}
+/*END OF WIDE SCREENS*/
 </style>

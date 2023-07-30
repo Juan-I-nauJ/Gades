@@ -22,12 +22,19 @@ const routes = [
       {
         path: 'contact',
         name: 'Contact Us',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/Contact.vue'),
+        component: () => import(/* webpackChunkName: "contact" */ '@/views/Contact.vue'),
       },
       {
         path: 'main',
         name: 'Podcasts',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/PodcastMain.vue'),
+        component: () => import(/* webpackChunkName: "main" */ '@/views/PodcastMain.vue'),
+        children: [
+          {
+            path: ':id',
+            name: 'details dummy',
+            component: () => import(/* webpackChunkName: "details" */ '@/views/SinglePodcast.vue'),
+          },
+        ]
       },
       {
         path: '/:pathMatch(.*)*',
