@@ -17,45 +17,43 @@
                         <p>By {{ podcast.length > 0 ? podcast[0].artistName : 'Loading..' }}</p>
                         <v-divider />
                         <v-list lines="one" v-if="podcast.length > 0">
-                            <v-list-item v-for="(item, i) in podcast[0].genres" :key="item" :title="'Genre #' + (+i + 1)"
-                                :subtitle="item"></v-list-item>
+                            <v-list-item v-for="(item, i) in podcast[0].genres" :key="item" :title="item"></v-list-item>
                         </v-list>
                         <p v-else>Loading...</p>
-                        <!-- <strong>Description:</strong>
-                        <p>و کسانی که اگر فرزندانی ناتوان پس از خود به جای می گذارند، بر آنان از ضایع شدن حقوقشان بیم دارند،
-                            باید از اینکه حقوق یتیمان دیگران را ضایع کنند بترسند. پس لازم است نسبت به شأن یتیمان از خدا پروا
-                            کنند، و درباره آنان سخنی درست و استوار گویند.</p>  -->
                     </v-sheet>
                 </v-col>
                 <v-col cols="12" lg="8">
                     <v-sheet rounded :elevation="9">
-                        <p><strong>Episodes: {{ podcast.length > 0 ? podcast[0].trackCount : 'Loading...' }}</strong></p>
+                        <p class="episode-section-title"><strong>Episodes: {{ podcast.length > 0 ? podcast[0].trackCount :
+                            'Loading...' }}</strong></p>
                     </v-sheet>
                     <v-sheet rounded :elevation="9" class="episode-table mt-5">
                         <v-table>
                             <thead>
                                 <tr>
-                                    <th class="text-left">
+                                    <th class="text-left font-weight-bold">
                                         Title
                                     </th>
-                                    <th class="text-left">
+                                    <th class="text-left font-weight-bold">
                                         Date
                                     </th>
-                                    <th class="text-left">
+                                    <th class="text-left font-weight-bold">
                                         Duration
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="text-left">
-                                        {{ podcast.length > 0 ? podcast[1].trackName : 'Loading...' }}
+                                <tr v-for="episode in podcast.slice(1)" :key="episode.trackId">
+                                    <td class="text-left episode-name">
+                                        {{ podcast.length > 0 ? episode.trackName : 'Loading...' }}
                                     </td>
                                     <td class="text-left">
-                                        {{ podcast.length > 0 ? podcast[1].releaseDate : 'Loading...' }}
+                                        {{ podcast.length > 0 ? DateTime.fromISO(episode.releaseDate).toFormat("dd/MM/yyyy")
+                                            : 'Loading...' }}
                                     </td>
                                     <td class="text-left">
-                                        {{ podcast.length > 0 ? podcast[1].trackTimeMillis : 'Loading...' }}
+                                        {{ podcast.length > 0 ?
+                                            Duration.fromMillis(episode.trackTimeMillis).toFormat('hh:mm:ss') : 'Loading...' }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -71,6 +69,7 @@
 <script setup>
 const props = defineProps({ id: String });
 import axios from 'axios';
+import { DateTime, Duration } from 'luxon';
 import { ref } from 'vue';
 
 const podcast = ref([]);
@@ -95,4 +94,21 @@ loadPodcast();
     min-width: 10rem;
 
 }
-</style>
+
+.episode-section-title {
+    font-size: 1.9rem;
+    text-align: center;
+    padding: 0.5rem;
+
+}
+
+.episode-name {
+    color: #006064;
+}
+
+@media (min-width: 80rem) {
+    .episode-section-title {
+        text-align: left;
+
+    }
+}</style>

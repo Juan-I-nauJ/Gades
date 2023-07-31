@@ -72,8 +72,8 @@ export default {
 }
 
 .v-main {
-  min-height: calc(100vh - 1.5rem);
-  margin-top: 1.5rem;
+  min-height: 100vh;
+  margin: 2.5rem 0;
 }
 
 .burger-button {
