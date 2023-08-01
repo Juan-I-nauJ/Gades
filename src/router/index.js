@@ -31,9 +31,17 @@ const routes = [
         children: [
           {
             path: ':id',
-            name: 'details dummy',
+            name: 'Podcast Detail',
             props: true,
             component: () => import(/* webpackChunkName: "details" */ '@/views/SinglePodcast.vue'),
+            children: [
+              {
+              path: 'episodes/:epid',
+              name: 'episode details dummy',
+              props: true,
+              component: () => import(/* webpackChunkName: "details" */ '@/views/SingleEpisode.vue'),
+              }
+            ]
           },
         ]
       },

@@ -58,6 +58,7 @@ export default {
     data: () => ({
         valid: false,
         search: '',
+        responseAllList: '',
         allList: [],
         searchList: [],
 
@@ -74,10 +75,11 @@ export default {
         }
     },
     methods: {
-        //this method gathers the podcast array from the api, tops out at 100 entries.
+        //this method gathers the podcast array from the api, tops out at 100 entries. The all origins api is used to avoid CORS problems.
         getList() {
-            axios.get('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')
-                .then((response) => this.allList = response.data.feed.entry);
+            axios.get(`https://api.allorigins.win/get?url=${encodeURIComponent('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')}`)
+            .catch(error => console.log('error when fetching database: ', error.response.data))
+                .then(response =>{this.responseAllList = JSON.parse(response.data.contents); this.allList = this.responseAllList.feed.entry;});
         },
         hideList() {
             this.viewingList = !this.viewingList;

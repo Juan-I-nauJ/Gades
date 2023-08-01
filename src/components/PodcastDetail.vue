@@ -17,12 +17,16 @@
                         <p>By {{ podcast.length > 0 ? podcast[0].artistName : 'Loading..' }}</p>
                         <v-divider />
                         <v-list lines="one" v-if="podcast.length > 0">
-                            <v-list-item v-for="(item, i) in podcast[0].genres" :key="item" :title="item"></v-list-item>
+                            <v-list-item v-for="item in podcast[0].genres" :key="item" :title="item"></v-list-item>
                         </v-list>
                         <p v-else>Loading...</p>
                     </v-sheet>
                 </v-col>
-                <v-col cols="12" lg="8">
+                <v-col cols="12" lg="8" v-if="!viewingEpisode">
+                <router-view :episode="episodeDetails"/>
+                </v-col>
+                
+                <v-col cols="12" lg="8" v-else>
                     <v-sheet rounded :elevation="9">
                         <p class="episode-section-title"><strong>Episodes: {{ podcast.length > 0 ? podcast[0].trackCount :
                             'Loading...' }}</strong></p>
@@ -43,9 +47,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="episode in podcast.slice(1)" :key="episode.trackId">
+                                <tr v-for="(episode, i) in podcast.slice(1)" :key="episode.trackId">
                                     <td class="text-left episode-name">
-                                        {{ podcast.length > 0 ? episode.trackName : 'Loading...' }}
+                                    <router-link :to="this.$route.path + '/episodes/' + episode.trackId" @click="episodeDetails = episode">{{ podcast.length > 0 ? episode.trackName : 'Loading...' }}</router-link>
                                     </td>
                                     <td class="text-left">
                                         {{ podcast.length > 0 ? DateTime.fromISO(episode.releaseDate).toFormat("dd/MM/yyyy")
@@ -69,15 +73,24 @@
 <script setup>
 const props = defineProps({ id: String });
 import axios from 'axios';
+import { useRoute } from 'vue-router'
 import { DateTime, Duration } from 'luxon';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
+const responsePodcast = ref('');
 const podcast = ref([]);
+const route = useRoute();
+const episodeDetails = ref({});
 
 function loadPodcast() {
-    axios.get('https://itunes.apple.com/lookup?id=' + props.id + '&media=podcast&entity=podcastEpisode&limit=20')
-        .then((response) => { podcast.value = response.data.results; console.log(podcast.value); });
-}
+    axios.get(`https://api.allorigins.win/get?url=${encodeURIComponent('https://itunes.apple.com/lookup?id=' + props.id + '&media=podcast&entity=podcastEpisode&limit=20')}`)
+    .catch(error => console.log('error when fetching database: ', error.response.data))
+    .then(response => {responsePodcast.value = JSON.parse(response.data.contents); podcast.value = responsePodcast.value.results; console.log(podcast)});
+ }
+
+const viewingEpisode = computed(()=>{
+return route.path === `/main/${props.id}`;
+});
 
 loadPodcast();
 </script>
