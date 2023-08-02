@@ -23,9 +23,9 @@
                     </v-sheet>
                 </v-col>
                 <v-col cols="12" lg="8" v-if="!viewingEpisode">
-                <router-view :episode="episodeDetails"/>
+                    <router-view :episode="episodeDetails" />
                 </v-col>
-                
+
                 <v-col cols="12" lg="8" v-else>
                     <v-sheet rounded :elevation="9">
                         <p class="episode-section-title"><strong>Episodes: {{ podcast.length > 0 ? podcast[0].trackCount :
@@ -49,7 +49,9 @@
                             <tbody>
                                 <tr v-for="(episode, i) in podcast.slice(1)" :key="episode.trackId">
                                     <td class="text-left episode-name">
-                                    <router-link :to="this.$route.path + '/episodes/' + episode.trackId" @click="episodeDetails = episode">{{ podcast.length > 0 ? episode.trackName : 'Loading...' }}</router-link>
+                                        <router-link :to="this.$route.path + '/episodes/' + episode.trackId"
+                                            @click="episodeDetails = episode">{{ podcast.length > 0 ? episode.trackName :
+                                                'Loading...' }}</router-link>
                                     </td>
                                     <td class="text-left">
                                         {{ podcast.length > 0 ? DateTime.fromISO(episode.releaseDate).toFormat("dd/MM/yyyy")
@@ -84,15 +86,43 @@ const episodeDetails = ref({});
 
 function loadPodcast() {
     axios.get(`https://api.allorigins.win/get?url=${encodeURIComponent('https://itunes.apple.com/lookup?id=' + props.id + '&media=podcast&entity=podcastEpisode&limit=20')}`)
-    .catch(error => console.log('error when fetching database: ', error.response.data))
-    .then(response => {responsePodcast.value = JSON.parse(response.data.contents); podcast.value = responsePodcast.value.results; console.log(podcast)});
- }
+        .catch(error => console.log('error when fetching database: ', error.response.data))
+        .then(response => { responsePodcast.value = JSON.parse(response.data.contents); podcast.value = responsePodcast.value.results; podcastStorageHandler(response); });
+}
 
-const viewingEpisode = computed(()=>{
-return route.path === `/main/${props.id}`;
+//the localStorage functions are similar to their equivalents in the AllPodcast component. 
+//the key used to save each json is the podcast's id (also found in the url route).
+function podcastStorageHandler(response) {
+    let expiration = DateTime.now().plus({ days: 1 });
+    if (!localStorage.getItem(props.id)) {
+        localStorage.setItem(props.id, response.data.contents);
+        localStorage.setItem(`${props.id}Expiration`, expiration.toISO());
+    } else {
+        return;
+    }
+};
+
+function podcastExpiration() {
+    if (!localStorage.getItem(`${props.id}Expiration`)) {
+        return;
+    } else {
+        let expiresIn = DateTime.fromISO(localStorage.getItem(`${props.id}Expiration`));
+        let today = DateTime.now();
+        if (today > expiresIn) {
+            localStorage.removeItem(props.id);
+            localStorage.removeItem(`${props.id}Expiration`);
+        }
+    }
+}
+
+const viewingEpisode = computed(() => {
+    return route.path === `/main/${props.id}`;
 });
 
-loadPodcast();
+//same flow as in the AllPodcast component. Checks whether the expiration date (if any) has passed to clear localStorage and then either
+//loads the data from localStorage or from the api.
+podcastExpiration();
+localStorage.getItem(props.id) ? podcast.value = JSON.parse(localStorage.getItem(props.id)).results : loadPodcast();
 </script>
 
 

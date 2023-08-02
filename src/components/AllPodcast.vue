@@ -50,6 +50,7 @@
 <script>
 import axios from 'axios';
 import Header from '@/layouts/added/Header.vue';
+import { DateTime } from 'luxon';
 
 export default {
     components: {
@@ -75,21 +76,46 @@ export default {
         }
     },
     methods: {
-        //this method gathers the podcast array from the api, tops out at 100 entries. The all origins api is used to avoid CORS problems.
+        //this method gathers the podcast array from the api, topping out at 100 entries. The all origins api is used to avoid issues relating to CORS.
         getList() {
             axios.get(`https://api.allorigins.win/get?url=${encodeURIComponent('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')}`)
             .catch(error => console.log('error when fetching database: ', error.response.data))
-                .then(response =>{this.responseAllList = JSON.parse(response.data.contents); this.allList = this.responseAllList.feed.entry;});
+                .then(response =>{this.responseAllList = JSON.parse(response.data.contents); this.allList = this.responseAllList.feed.entry; this.podcastListStorageHandler(response); });
         },
         hideList() {
             this.viewingList = !this.viewingList;
+        },
+        //checks whether there is a podcast list already stored in localStorage and stores the one taken from the api together with an
+        //expiration date for the month after if there isn't.
+        podcastListStorageHandler(response){
+            let expiration = DateTime.now().plus({months: 1});
+            if(!localStorage.getItem('podcastList')){
+                localStorage.setItem('podcastList', response.data.contents);
+                localStorage.setItem('podcastListExpiration', expiration.toISO());
+            }else{
+                return;
+            }
+        },
+        //compares the stored expiration date (if any, otherwise it simply returns) with the current date, if the expiration date has 
+        //already passed by, it clears the podcast list and the date from localStorage.  
+        podcastListStorageExpiration(){
+            if(!localStorage.getItem('podcastListExpiration')){
+                return;
+            }else{
+                let expiresIn = DateTime.fromISO(localStorage.getItem('podcastListExpiration'));
+                let today = DateTime.now();
+                if(today > expiresIn){
+                    localStorage.removeItem('podcastList');
+                    localStorage.removeItem('podcastListExpiration');
+                }
+            }
         }
     },
     mounted() {
-        //this method calls getList when the component is mounted, it will need an if statement down the line to interface with 
-        //localstorage.
-
-        this.getList();
+        //checks for localStorage expiration dates first, then either loads the stored podcast list or gets a new one from the api.
+        this.podcastListStorageExpiration();
+        localStorage.getItem('podcastList') ? this.allList = JSON.parse(localStorage.getItem('podcastList')).feed.entry : this.getList();
+        
     }
 }
 
@@ -216,4 +242,5 @@ export default {
     }
 }
 
-/*END OF WIDE SCREENS*/</style>
+/*END OF WIDE SCREENS*/
+</style>

@@ -13,7 +13,6 @@
 <script setup>
 const props = defineProps({episode: Object});
 
-console.log(props.episode);
 </script>
 
 <style scoped>
