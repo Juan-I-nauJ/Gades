@@ -1,9 +1,11 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="align-center text-center border pa-4">
-            <div class="text-right spinner">
-                <v-progress-circular indeterminate color="primary" v-if="podcast.length < 1"></v-progress-circular>
-            </div>
+            <v-overlay z-index="1000" v-model="overlay">
+                <div class="text-right spinner-container">
+                    <v-progress-circular indeterminate color="red-accent-4" width="10" class="spinner" size="100"></v-progress-circular>
+                </div>
+            </v-overlay>
             <v-row>
                 <v-col cols="12" lg="4">
                     <v-sheet rounded :elevation="9" class="podcast-details">
@@ -118,6 +120,10 @@ function podcastExpiration() {
 const viewingEpisode = computed(() => {
     return route.path === `/main/${props.id}`;
 });
+
+const isLoading = computed(()=>podcast.value.length <= 0); 
+const overlay = computed(()=>isLoading.value);
+        
 
 //same flow as in the AllPodcast component. Checks whether the expiration date (if any) has passed to clear localStorage and then either
 //loads the data from localStorage or from the api.

@@ -1,9 +1,11 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="align-center text-center border pa-4">
-            <div class="text-right spinner" v-if="isLoading">
-                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            <v-overlay z-index="1000" v-model="overlay">
+            <div class="text-right spinner-container">
+                <v-progress-circular indeterminate color="red-accent-4" width="10" class="spinner" size="100"></v-progress-circular>
             </div>
+        </v-overlay>
             <router-view></router-view>
             <article v-if="activeList">
                 <main class="main-container">
@@ -73,7 +75,17 @@ export default {
         },
         activeList() {
             return this.$route.path === '/main';
+        },
+        overlay(){
+            return this.isLoading;
         }
+    },
+    watch: {
+      overlay (val) {
+        val && setTimeout(() => {
+          this.overlay = false
+        }, 2000)
+      },
     },
     methods: {
         //this method gathers the podcast array from the api, topping out at 100 entries. The all origins api is used to avoid issues relating to CORS.

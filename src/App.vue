@@ -7,9 +7,10 @@
 </script>
 
 <style>
-.spinner {
-  position: absolute;
-  top: -5;
-  right: 0;
+.spinner-container {
+translate: 50vw 50vh;
+width: 3rem;
+height: 3rem;
 }
+
 </style>
