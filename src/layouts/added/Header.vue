@@ -1,6 +1,6 @@
 <template>
     <header>
-        <h3 class="text-h3">Podcaster</h3>
+        <h3 class="text-h3">Gades</h3>
         <hr>
     </header>
 </template>
